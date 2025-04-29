@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import RegistroCliente from './components/RegistroCliente';
 import RecargarBilletera from './components/RecargarBilletera';
 import GenerarCompra from './components/GenerarCompra';
-
+import ConsultarSaldo from './components/ConsultarSaldo';
 
 export default function App() {
   const [view, setView] = useState('registro');
@@ -12,6 +12,7 @@ export default function App() {
       case 'registro': return <RegistroCliente />;
       case 'recarga': return <RecargarBilletera />;
       case 'generar': return <GenerarCompra />;
+      case 'saldo': return <ConsultarSaldo />;
       default: return <RegistroCliente />;
     }
   };
@@ -23,6 +24,7 @@ export default function App() {
         <button onClick={() => setView('registro')} style={styles.button}>Registro</button>
         <button onClick={() => setView('recarga')} style={styles.button}>Recargar</button>
         <button onClick={() => setView('generar')} style={styles.button}>Generar Compra</button>
+        <button onClick={() => setView('saldo')} style={styles.button}>Consultar Saldo</button>
       </nav>
       <div style={{ marginTop: '2rem' }}>
         {renderComponent()}
