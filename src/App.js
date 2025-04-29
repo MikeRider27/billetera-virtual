@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import RegistroCliente from './components/RegistroCliente';
+import RecargarBilletera from './components/RecargarBilletera';
+
 
 export default function App() {
   const [view, setView] = useState('registro');
@@ -7,6 +9,7 @@ export default function App() {
   const renderComponent = () => {
     switch (view) {
       case 'registro': return <RegistroCliente />;
+      case 'recarga': return <RecargarBilletera />;
       default: return <RegistroCliente />;
     }
   };
@@ -16,6 +19,7 @@ export default function App() {
       <h1 style={styles.title}>Billetera Virtual</h1>
       <nav style={styles.menu}>
         <button onClick={() => setView('registro')} style={styles.button}>Registro</button>
+        <button onClick={() => setView('recarga')} style={styles.button}>Recargar</button>
       </nav>
       <div style={{ marginTop: '2rem' }}>
         {renderComponent()}
