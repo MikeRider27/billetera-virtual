@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import RegistroCliente from './components/RegistroCliente';
 import RecargarBilletera from './components/RecargarBilletera';
+import GenerarCompra from './components/GenerarCompra';
 
 
 export default function App() {
@@ -10,6 +11,7 @@ export default function App() {
     switch (view) {
       case 'registro': return <RegistroCliente />;
       case 'recarga': return <RecargarBilletera />;
+      case 'generar': return <GenerarCompra />;
       default: return <RegistroCliente />;
     }
   };
@@ -20,6 +22,7 @@ export default function App() {
       <nav style={styles.menu}>
         <button onClick={() => setView('registro')} style={styles.button}>Registro</button>
         <button onClick={() => setView('recarga')} style={styles.button}>Recargar</button>
+        <button onClick={() => setView('generar')} style={styles.button}>Generar Compra</button>
       </nav>
       <div style={{ marginTop: '2rem' }}>
         {renderComponent()}
