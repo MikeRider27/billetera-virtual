@@ -1,0 +1,21 @@
+services:
+  wallet-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        REACT_APP_API_URL: ${REACT_APP_API_URL} # 👈 pasa la variable al build
+    container_name: wallet-app
+    restart: always
+    volumes:
+      - ./:/app
+    ports:
+      - "3000:3000"
+    networks:
+      - app
+    env_file:
+      - .env
+
+networks:
+  app:
+    driver: bridge
