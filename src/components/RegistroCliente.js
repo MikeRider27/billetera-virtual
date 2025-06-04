@@ -10,6 +10,7 @@ export default function RegistroCliente() {
   });
 
   const [response, setResponse] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -17,12 +18,15 @@ export default function RegistroCliente() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       const res = await api.post("/registro-cliente", form);
       setResponse({ success: true, mensaje: res.data.mensaje });
       setForm({ documento: "", nombre: "", email: "", celular: "" }); // limpiar formulario
     } catch (err) {
       setResponse({ success: false, mensaje: "Error en el registro" });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -63,7 +67,9 @@ export default function RegistroCliente() {
           required
           style={styles.input}
         />
-        <button type="submit" style={styles.button}>Registrar</button>
+        <button type="submit" style={styles.button} disabled={loading}>
+          {loading ? 'Enviando...' : 'Registrar'}
+        </button>
       </form>
 
       {response && (

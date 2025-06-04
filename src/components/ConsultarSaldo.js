@@ -8,6 +8,7 @@ export default function ConsultarSaldo() {
   });
 
   const [response, setResponse] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -15,6 +16,7 @@ export default function ConsultarSaldo() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       const res = await api.post('/consultar-saldo', form);
       setResponse({
@@ -24,6 +26,8 @@ export default function ConsultarSaldo() {
       });
     } catch {
       setResponse({ success: false, mensaje: 'Error al consultar el saldo' });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -45,7 +49,9 @@ export default function ConsultarSaldo() {
           required
           style={styles.input}
         />
-        <button type="submit" style={styles.button}>Consultar</button>
+        <button type="submit" style={styles.button} disabled={loading}>
+          {loading ? 'Consultando...' : 'Consultar'}
+        </button>
       </form>
 
       {response && (
