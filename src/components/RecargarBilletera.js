@@ -10,6 +10,7 @@ export default function RecargarBilletera() {
   });
 
   const [response, setResponse] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -17,12 +18,15 @@ export default function RecargarBilletera() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       const res = await api.post('/recargar-billetera', form);
       setResponse({ success: true, mensaje: res.data.mensaje });
       setForm({ documento: '', celular: '', monto: '' }); // limpiar formulario
     } catch (err) {
       setResponse({ success: false, mensaje: 'Error al recargar' });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -65,7 +69,9 @@ export default function RecargarBilletera() {
           type="number"
           style={styles.input}
         />
-        <button type="submit" style={styles.button}>Recargar</button>
+        <button type="submit" style={styles.button} disabled={loading}>
+          {loading ? 'Enviando...' : 'Recargar'}
+        </button>
       </form>
 
       {response && (

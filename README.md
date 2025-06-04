@@ -21,11 +21,10 @@ git clone https://github.com/MikeRider27/billetera-virtual.git
 cd billetera-virtual
 ```
 
-Crea un archivo `.env` en la raíz del proyecto con:
+Copia el archivo `.env.example` a `.env` en la raíz del proyecto:
 
-```
-REACT_APP_API_URL=http://host.docker.internal:9001/api
-PORT=3000
+```bash
+cp .env.example .env
 ```
 
 > 📝 Asegúrate de que el puerto `9001` coincida con el servicio REST en tu máquina.
@@ -53,6 +52,7 @@ http://localhost:3000
 - 💰 Recarga de saldo
 - 🛒 Generación y confirmación de compra
 - 📊 Consulta de saldo
+- ⏳ Indicadores de carga mientras se realizan peticiones
 
 ---
 
@@ -64,7 +64,7 @@ src/
 ├── components/          # Componentes individuales por funcionalidad
 │   ├── RegistroCliente.js
 │   ├── RecargarBilletera.js
-│   ├── GenerarYConfirmarCompra.js
+│   ├── GenerarCompra.js
 │   └── ConsultarSaldo.js
 ├── App.js               # Estructura principal y navegación
 └── index.js             # Punto de entrada React

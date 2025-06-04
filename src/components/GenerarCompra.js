@@ -11,6 +11,8 @@ export default function GenerarYConfirmarCompra() {
   const [response, setResponse] = useState(null);
   const [confirmationResponse, setConfirmationResponse] = useState(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [confirming, setConfirming] = useState(false);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -18,6 +20,7 @@ export default function GenerarYConfirmarCompra() {
 
   const generarCompra = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       const res = await api.post('/generar-compra', form);
       setResponse({
@@ -30,10 +33,13 @@ export default function GenerarYConfirmarCompra() {
     } catch (err) {
       setResponse({ success: false, mensaje: 'Error al generar la compra' });
       setShowConfirmation(false);
+    } finally {
+      setLoading(false);
     }
   };
 
   const confirmarCompra = async () => {
+    setConfirming(true);
     try {
       const res = await api.post('/confirmar-compra', {
         sessionId: response.session_id,
@@ -48,6 +54,8 @@ export default function GenerarYConfirmarCompra() {
         success: false,
         mensaje: 'Error al confirmar el pago',
       });
+    } finally {
+      setConfirming(false);
     }
   };
 
@@ -80,7 +88,9 @@ export default function GenerarYConfirmarCompra() {
           required
           style={styles.input}
         />
-        <button type="submit" style={styles.button}>Generar Compra</button>
+        <button type="submit" style={styles.button} disabled={loading}>
+          {loading ? 'Generando...' : 'Generar Compra'}
+        </button>
       </form>
 
       {response && (
@@ -98,8 +108,8 @@ export default function GenerarYConfirmarCompra() {
               <p><strong>ID Sesión:</strong> {response.session_id}</p>
               <p><strong>Token:</strong> {response.token}</p>
               {showConfirmation && (
-                <button onClick={confirmarCompra} style={styles.confirmButton}>
-                  Confirmar Compra
+                <button onClick={confirmarCompra} style={styles.confirmButton} disabled={confirming}>
+                  {confirming ? 'Confirmando...' : 'Confirmar Compra'}
                 </button>
               )}
             </>
