@@ -1,12 +1,16 @@
-import React, { useState } from "react";
-import api from "../api/api";
+import React, { useState } from 'react';
+import Card from 'react-bootstrap/Card';
+import Form from 'react-bootstrap/Form';
+import Button from 'react-bootstrap/Button';
+import Alert from 'react-bootstrap/Alert';
+import api from '../api/api';
 
 export default function RegistroCliente() {
   const [form, setForm] = useState({
-    documento: "",
-    nombre: "",
-    email: "",
-    celular: "",
+    documento: '',
+    nombre: '',
+    email: '',
+    celular: '',
   });
 
   const [response, setResponse] = useState(null);
@@ -20,117 +24,75 @@ export default function RegistroCliente() {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await api.post("/registro-cliente", form);
-      setResponse({ success: true, mensaje: res.data.mensaje });
-      setForm({ documento: "", nombre: "", email: "", celular: "" }); // limpiar formulario
+      const res = await api.post('/registro-cliente', form);
+      const success = res.data.codigo === '00';
+      setResponse({ success, mensaje: res.data.mensaje });
+      if (success) {
+        setForm({ documento: '', nombre: '', email: '', celular: '' });
+      }
     } catch (err) {
-      setResponse({ success: false, mensaje: "Error en el registro" });
+      setResponse({
+        success: false,
+        mensaje: err.response?.data?.mensaje ?? 'No se pudo completar el registro. Intentá nuevamente.',
+      });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div style={styles.container}>
-      <h2 style={styles.title}>Registro de Cliente</h2>
-      <form onSubmit={handleSubmit} style={styles.form}>
-        <input
-          name="documento"
-          placeholder="Documento"
-          value={form.documento}
-          onChange={handleChange}
-          required
-          style={styles.input}
-        />
-        <input
-          name="nombre"
-          placeholder="Nombre"
-          value={form.nombre}
-          onChange={handleChange}
-          required
-          style={styles.input}
-        />
-        <input
-          name="email"
-          placeholder="Email"
-          type="email"
-          value={form.email}
-          onChange={handleChange}
-          required
-          style={styles.input}
-        />
-        <input
-          name="celular"
-          placeholder="Celular"
-          value={form.celular}
-          onChange={handleChange}
-          required
-          style={styles.input}
-        />
-        <button type="submit" style={styles.button} disabled={loading}>
-          {loading ? 'Enviando...' : 'Registrar'}
-        </button>
-      </form>
+    <Card className="mx-auto" style={{ maxWidth: '480px' }}>
+      <Card.Body>
+        <Card.Title as="h2" className="text-center mb-3 h4">Registro de Cliente</Card.Title>
+        <Form onSubmit={handleSubmit}>
+          <Form.Group className="mb-3" controlId="registro-documento">
+            <Form.Label>Documento</Form.Label>
+            <Form.Control
+              name="documento"
+              value={form.documento}
+              onChange={handleChange}
+              required
+            />
+          </Form.Group>
+          <Form.Group className="mb-3" controlId="registro-nombre">
+            <Form.Label>Nombre</Form.Label>
+            <Form.Control
+              name="nombre"
+              value={form.nombre}
+              onChange={handleChange}
+              required
+            />
+          </Form.Group>
+          <Form.Group className="mb-3" controlId="registro-email">
+            <Form.Label>Email</Form.Label>
+            <Form.Control
+              name="email"
+              type="email"
+              value={form.email}
+              onChange={handleChange}
+              required
+            />
+          </Form.Group>
+          <Form.Group className="mb-3" controlId="registro-celular">
+            <Form.Label>Celular</Form.Label>
+            <Form.Control
+              name="celular"
+              value={form.celular}
+              onChange={handleChange}
+              required
+            />
+          </Form.Group>
+          <Button type="submit" variant="primary" className="w-100" disabled={loading}>
+            {loading ? 'Enviando...' : 'Registrar'}
+          </Button>
+        </Form>
 
-      {response && (
-        <div
-          style={{
-            ...styles.responseBox,
-            backgroundColor: response.success ? "#d4edda" : "#f8d7da",
-            color: response.success ? "#155724" : "#721c24",
-            borderColor: response.success ? "#c3e6cb" : "#f5c6cb",
-          }}
-        >
-          <p style={styles.pre}>{response.mensaje}</p>
-        </div>
-      )}
-    </div>
+        {response && (
+          <Alert variant={response.success ? 'success' : 'danger'} className="mt-3 mb-0">
+            {response.mensaje}
+          </Alert>
+        )}
+      </Card.Body>
+    </Card>
   );
 }
-
-const styles = {
-  container: {
-    maxWidth: "400px",
-    margin: "2rem auto",
-    padding: "2rem",
-    borderRadius: "10px",
-    boxShadow: "0 0 10px rgba(0,0,0,0.1)",
-    backgroundColor: "#fff",
-    fontFamily: "Arial, sans-serif",
-  },
-  title: {
-    marginBottom: "1rem",
-    textAlign: "center",
-  },
-  form: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "1rem",
-  },
-  input: {
-    padding: "10px",
-    fontSize: "1rem",
-    borderRadius: "5px",
-    border: "1px solid #ccc",
-  },
-  button: {
-    padding: "10px",
-    fontSize: "1rem",
-    borderRadius: "5px",
-    backgroundColor: "#007bff",
-    color: "#fff",
-    border: "none",
-    cursor: "pointer",
-  },
-  responseBox: {
-    marginTop: "1.5rem",
-    padding: "1rem",
-    border: "1px solid",
-    borderRadius: "5px",
-  },
-  pre: {
-    margin: 0,
-    fontSize: "1rem",
-    fontWeight: "bold",
-  },
-};

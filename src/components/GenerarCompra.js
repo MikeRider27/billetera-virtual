@@ -1,4 +1,8 @@
 import React, { useState } from 'react';
+import Card from 'react-bootstrap/Card';
+import Form from 'react-bootstrap/Form';
+import Button from 'react-bootstrap/Button';
+import Alert from 'react-bootstrap/Alert';
 import api from '../api/api';
 
 export default function GenerarYConfirmarCompra() {
@@ -21,17 +25,22 @@ export default function GenerarYConfirmarCompra() {
   const generarCompra = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setConfirmationResponse(null);
     try {
       const res = await api.post('/generar-compra', form);
+      const success = res.data.codigo === '00';
       setResponse({
-        success: true,
+        success,
         mensaje: res.data.mensaje,
         session_id: res.data.data?.session_id,
         token: res.data.data?.token,
       });
-      setShowConfirmation(true);
+      setShowConfirmation(success);
     } catch (err) {
-      setResponse({ success: false, mensaje: 'Error al generar la compra' });
+      setResponse({
+        success: false,
+        mensaje: err.response?.data?.mensaje ?? 'No se pudo generar la compra. Intentá nuevamente.',
+      });
       setShowConfirmation(false);
     } finally {
       setLoading(false);
@@ -49,10 +58,10 @@ export default function GenerarYConfirmarCompra() {
         success: res.data.codigo === '00',
         mensaje: res.data.mensaje,
       });
-    } catch {
+    } catch (err) {
       setConfirmationResponse({
         success: false,
-        mensaje: 'Error al confirmar el pago',
+        mensaje: err.response?.data?.mensaje ?? 'No se pudo confirmar el pago. Intentá nuevamente.',
       });
     } finally {
       setConfirming(false);
@@ -60,132 +69,78 @@ export default function GenerarYConfirmarCompra() {
   };
 
   return (
-    <div style={styles.container}>
-      <h2 style={styles.title}>Generar y Confirmar Compra</h2>
-      <form onSubmit={generarCompra} style={styles.form}>
-        <input
-          name="documento"
-          placeholder="Documento"
-          value={form.documento}
-          onChange={handleChange}
-          required
-          style={styles.input}
-        />
-        <input
-          name="celular"
-          placeholder="Celular"
-          value={form.celular}
-          onChange={handleChange}
-          required
-          style={styles.input}
-        />
-        <input
-          name="montoCompra"
-          placeholder="Monto de Compra"
-          type="number"
-          value={form.montoCompra}
-          onChange={handleChange}
-          required
-          style={styles.input}
-        />
-        <button type="submit" style={styles.button} disabled={loading}>
-          {loading ? 'Generando...' : 'Generar Compra'}
-        </button>
-      </form>
+    <Card className="mx-auto" style={{ maxWidth: '520px' }}>
+      <Card.Body>
+        <Card.Title as="h2" className="text-center mb-3 h4">Generar y Confirmar Compra</Card.Title>
+        <Form onSubmit={generarCompra}>
+          <Form.Group className="mb-3" controlId="compra-documento">
+            <Form.Label>Documento</Form.Label>
+            <Form.Control
+              name="documento"
+              value={form.documento}
+              onChange={handleChange}
+              required
+            />
+          </Form.Group>
+          <Form.Group className="mb-3" controlId="compra-celular">
+            <Form.Label>Celular</Form.Label>
+            <Form.Control
+              name="celular"
+              value={form.celular}
+              onChange={handleChange}
+              required
+            />
+          </Form.Group>
+          <Form.Group className="mb-3" controlId="compra-monto">
+            <Form.Label>Monto de Compra</Form.Label>
+            <Form.Control
+              name="montoCompra"
+              type="number"
+              value={form.montoCompra}
+              onChange={handleChange}
+              required
+            />
+          </Form.Group>
+          <Button type="submit" variant="primary" className="w-100" disabled={loading}>
+            {loading ? 'Generando...' : 'Generar Compra'}
+          </Button>
+        </Form>
 
-      {response && (
-        <div
-          style={{
-            ...styles.responseBox,
-            backgroundColor: response.success ? '#d4edda' : '#f8d7da',
-            color: response.success ? '#155724' : '#721c24',
-            borderColor: response.success ? '#c3e6cb' : '#f5c6cb',
-          }}
-        >
-          <p style={styles.pre}>{response.mensaje}</p>
-          {response.session_id && (
-            <>
-              <p><strong>ID Sesión:</strong> {response.session_id}</p>
-              <p><strong>Token:</strong> {response.token}</p>
-              {showConfirmation && (
-                <button onClick={confirmarCompra} style={styles.confirmButton} disabled={confirming}>
-                  {confirming ? 'Confirmando...' : 'Confirmar Compra'}
-                </button>
-              )}
-            </>
-          )}
-        </div>
-      )}
+        {response && (
+          <Alert variant={response.success ? 'success' : 'danger'} className="mt-3 mb-0">
+            <p className="mb-0">{response.mensaje}</p>
+            {response.session_id && (
+              <>
+                <p className="mb-1 mt-2">
+                  <strong>ID Sesión:</strong> {response.session_id}
+                </p>
+                <p className="mb-2">
+                  <strong>Token:</strong> {response.token}
+                </p>
+                {showConfirmation && (
+                  <Button
+                    variant="success"
+                    size="sm"
+                    onClick={confirmarCompra}
+                    disabled={confirming}
+                  >
+                    {confirming ? 'Confirmando...' : 'Confirmar Compra'}
+                  </Button>
+                )}
+              </>
+            )}
+          </Alert>
+        )}
 
-      {confirmationResponse && (
-        <div
-          style={{
-            ...styles.responseBox,
-            backgroundColor: confirmationResponse.success ? '#d1ecf1' : '#f8d7da',
-            color: confirmationResponse.success ? '#0c5460' : '#721c24',
-            borderColor: confirmationResponse.success ? '#bee5eb' : '#f5c6cb',
-          }}
-        >
-          <p style={styles.pre}>{confirmationResponse.mensaje}</p>
-        </div>
-      )}
-    </div>
+        {confirmationResponse && (
+          <Alert
+            variant={confirmationResponse.success ? 'info' : 'danger'}
+            className="mt-3 mb-0"
+          >
+            {confirmationResponse.mensaje}
+          </Alert>
+        )}
+      </Card.Body>
+    </Card>
   );
 }
-
-const styles = {
-  container: {
-    maxWidth: '500px',
-    margin: '2rem auto',
-    padding: '2rem',
-    borderRadius: '10px',
-    boxShadow: '0 0 10px rgba(0,0,0,0.1)',
-    backgroundColor: '#fff',
-    fontFamily: 'Arial, sans-serif',
-  },
-  title: {
-    marginBottom: '1rem',
-    textAlign: 'center',
-  },
-  form: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '1rem',
-  },
-  input: {
-    padding: '10px',
-    fontSize: '1rem',
-    borderRadius: '5px',
-    border: '1px solid #ccc',
-  },
-  button: {
-    padding: '10px',
-    fontSize: '1rem',
-    borderRadius: '5px',
-    backgroundColor: '#007bff',
-    color: '#fff',
-    border: 'none',
-    cursor: 'pointer',
-  },
-  confirmButton: {
-    marginTop: '1rem',
-    padding: '10px',
-    fontSize: '1rem',
-    borderRadius: '5px',
-    backgroundColor: '#28a745',
-    color: '#fff',
-    border: 'none',
-    cursor: 'pointer',
-  },
-  responseBox: {
-    marginTop: '1.5rem',
-    padding: '1rem',
-    border: '1px solid',
-    borderRadius: '5px',
-  },
-  pre: {
-    margin: 0,
-    fontSize: '1rem',
-    fontWeight: 'bold',
-  },
-};

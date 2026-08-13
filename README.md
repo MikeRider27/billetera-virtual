@@ -7,8 +7,9 @@ Este proyecto representa el **cliente web** de la billetera virtual. Desarrollad
 ## 🛠️ Tecnologías Utilizadas
 
 - React JS
+- React-Bootstrap / Bootstrap
 - Axios
-- Docker
+- Docker (modo desarrollo, con hot-reload)
 - Docker Compose
 
 ---
@@ -27,8 +28,11 @@ Copia el archivo `.env.example` a `.env` en la raíz del proyecto:
 cp .env.example .env
 ```
 
-> 📝 Asegúrate de que el puerto `9001` coincida con el servicio REST en tu máquina.
-> `host.docker.internal` permite que el contenedor acceda al host desde Docker.
+```env
+REACT_APP_API_URL=http://localhost:9001/api
+```
+
+> ⚠️ `REACT_APP_API_URL` la usa el navegador (el bundle de React corre en tu máquina, no dentro de un contenedor), así que tiene que ser una URL alcanzable desde ahí — `localhost:9001`, no `host.docker.internal:9001` (eso solo se resuelve *dentro* de contenedores Docker). Asegurate de que `rest-wallet` esté publicado en ese puerto.
 
 ---
 
@@ -37,6 +41,8 @@ cp .env.example .env
 ```bash
 docker compose up --build -d
 ```
+
+El contenedor corre en modo desarrollo (`npm start` con hot-reload); el código se monta como volumen, así que los cambios se reflejan sin reconstruir la imagen.
 
 Abre la aplicación en tu navegador en:
 
@@ -74,10 +80,12 @@ src/
 
 ## ✅ Buenas Prácticas
 
-- Comunicación REST mediante Axios.
-- Separación por componentes.
-- Mensajes claros al usuario.
-- Dockerización lista para producción/despliegue.
+- Comunicación REST mediante Axios (con timeout configurado).
+- Separación por componentes, UI consistente con React-Bootstrap (Card, Form, Alert).
+- Formularios accesibles (labels asociados a cada campo, no solo placeholders).
+- Los mensajes de éxito/error reflejan el `codigo` real que devuelve el backend, no solo si el HTTP respondió 200.
+- Los errores de red/servidor muestran el mensaje real devuelto por la API cuando está disponible.
+- Dockerfile en modo desarrollo (sin pasos de build que después no se usan).
 
 ---
 

@@ -1,62 +1,50 @@
 import React, { useState } from 'react';
+import Container from 'react-bootstrap/Container';
+import Navbar from 'react-bootstrap/Navbar';
+import Nav from 'react-bootstrap/Nav';
 import RegistroCliente from './components/RegistroCliente';
 import RecargarBilletera from './components/RecargarBilletera';
 import GenerarCompra from './components/GenerarCompra';
 import ConsultarSaldo from './components/ConsultarSaldo';
 
+const VIEWS = [
+  { key: 'registro', label: 'Registro', component: RegistroCliente },
+  { key: 'recarga', label: 'Recargar', component: RecargarBilletera },
+  { key: 'generar', label: 'Generar Compra', component: GenerarCompra },
+  { key: 'saldo', label: 'Consultar Saldo', component: ConsultarSaldo },
+];
+
 export default function App() {
   const [view, setView] = useState('registro');
 
-  const renderComponent = () => {
-    switch (view) {
-      case 'registro': return <RegistroCliente />;
-      case 'recarga': return <RecargarBilletera />;
-      case 'generar': return <GenerarCompra />;
-      case 'saldo': return <ConsultarSaldo />;
-      default: return <RegistroCliente />;
-    }
-  };
+  const ActiveComponent = VIEWS.find((v) => v.key === view)?.component ?? RegistroCliente;
 
   return (
-    <div style={styles.container}>
-      <h1 style={styles.title}>Billetera Virtual</h1>
-      <nav style={styles.menu}>
-        <button onClick={() => setView('registro')} style={styles.button}>Registro</button>
-        <button onClick={() => setView('recarga')} style={styles.button}>Recargar</button>
-        <button onClick={() => setView('generar')} style={styles.button}>Generar Compra</button>
-        <button onClick={() => setView('saldo')} style={styles.button}>Consultar Saldo</button>
-      </nav>
-      <div style={{ marginTop: '2rem' }}>
-        {renderComponent()}
-      </div>
+    <div style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
+      <Navbar bg="primary" variant="dark" expand="sm">
+        <Container>
+          <Navbar.Brand>Billetera Virtual</Navbar.Brand>
+          <Navbar.Toggle aria-controls="main-nav" />
+          <Navbar.Collapse id="main-nav">
+            <Nav
+              variant="pills"
+              activeKey={view}
+              onSelect={(key) => key && setView(key)}
+              className="ms-auto"
+            >
+              {VIEWS.map(({ key, label }) => (
+                <Nav.Item key={key}>
+                  <Nav.Link eventKey={key}>{label}</Nav.Link>
+                </Nav.Item>
+              ))}
+            </Nav>
+          </Navbar.Collapse>
+        </Container>
+      </Navbar>
+
+      <Container className="py-4">
+        <ActiveComponent />
+      </Container>
     </div>
   );
 }
-
-const styles = {
-  container: {
-    padding: '2rem',
-    fontFamily: 'Arial, sans-serif',
-    backgroundColor: '#f8f9fa',
-    minHeight: '100vh',
-  },
-  title: {
-    textAlign: 'center',
-    marginBottom: '1.5rem',
-  },
-  menu: {
-    display: 'flex',
-    justifyContent: 'center',
-    gap: '1rem',
-    flexWrap: 'wrap',
-  },
-  button: {
-    padding: '0.6rem 1.2rem',
-    borderRadius: '5px',
-    border: 'none',
-    backgroundColor: '#007bff',
-    color: '#fff',
-    cursor: 'pointer',
-    fontSize: '1rem',
-  }
-};
