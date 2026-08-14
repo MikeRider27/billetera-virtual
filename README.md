@@ -54,7 +54,8 @@ http://localhost:3000
 
 ## 📋 Funcionalidades
 
-- 📄 Registro de cliente
+- 🔐 Login con documento + contraseña (sesión persistida en `localStorage`)
+- 📄 Registro de cliente (con contraseña)
 - 💰 Recarga de saldo
 - 🛒 Generación y confirmación de compra
 - 📊 Consulta de saldo
@@ -62,17 +63,25 @@ http://localhost:3000
 
 ---
 
+## 🔐 Sesión
+
+Sin sesión iniciada, la app solo muestra **Login** (con un link a **Registro** para crear cuenta). Al loguearse, `rest-wallet` devuelve un token que se guarda en `localStorage` (`src/session.js`) y viaja automáticamente como header `Authorization: Bearer <token>` en cada request (interceptor en `src/api/api.js`) — por eso Recargar, Generar Compra y Consultar Saldo ya no piden `documento`/`celular`: la identidad sale de la sesión. "Cerrar sesión" limpia el `localStorage` y vuelve a mostrar el Login.
+
+---
+
 ## 📁 Estructura del Proyecto
 
 ```
 src/
-├── api/                 # Configuración Axios (cliente REST)
+├── api/                 # Configuración Axios (cliente REST + interceptor de token)
+├── session.js           # Guardar/leer/borrar la sesión en localStorage
 ├── components/          # Componentes individuales por funcionalidad
+│   ├── Login.js
 │   ├── RegistroCliente.js
 │   ├── RecargarBilletera.js
 │   ├── GenerarCompra.js
 │   └── ConsultarSaldo.js
-├── App.js               # Estructura principal y navegación
+├── App.js               # Gating de sesión, navegación y logout
 └── index.js             # Punto de entrada React
 ```
 

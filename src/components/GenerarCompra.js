@@ -6,11 +6,7 @@ import Alert from 'react-bootstrap/Alert';
 import api from '../api/api';
 
 export default function GenerarYConfirmarCompra() {
-  const [form, setForm] = useState({
-    documento: '',
-    celular: '',
-    montoCompra: '',
-  });
+  const [montoCompra, setMontoCompra] = useState('');
 
   const [response, setResponse] = useState(null);
   const [confirmationResponse, setConfirmationResponse] = useState(null);
@@ -18,16 +14,12 @@ export default function GenerarYConfirmarCompra() {
   const [loading, setLoading] = useState(false);
   const [confirming, setConfirming] = useState(false);
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
   const generarCompra = async (e) => {
     e.preventDefault();
     setLoading(true);
     setConfirmationResponse(null);
     try {
-      const res = await api.post('/generar-compra', form);
+      const res = await api.post('/generar-compra', { montoCompra });
       const success = res.data.codigo === '00';
       setResponse({
         success,
@@ -73,31 +65,13 @@ export default function GenerarYConfirmarCompra() {
       <Card.Body>
         <Card.Title as="h2" className="text-center mb-3 h4">Generar y Confirmar Compra</Card.Title>
         <Form onSubmit={generarCompra}>
-          <Form.Group className="mb-3" controlId="compra-documento">
-            <Form.Label>Documento</Form.Label>
-            <Form.Control
-              name="documento"
-              value={form.documento}
-              onChange={handleChange}
-              required
-            />
-          </Form.Group>
-          <Form.Group className="mb-3" controlId="compra-celular">
-            <Form.Label>Celular</Form.Label>
-            <Form.Control
-              name="celular"
-              value={form.celular}
-              onChange={handleChange}
-              required
-            />
-          </Form.Group>
           <Form.Group className="mb-3" controlId="compra-monto">
             <Form.Label>Monto de Compra</Form.Label>
             <Form.Control
               name="montoCompra"
               type="number"
-              value={form.montoCompra}
-              onChange={handleChange}
+              value={montoCompra}
+              onChange={(e) => setMontoCompra(e.target.value)}
               required
             />
           </Form.Group>
